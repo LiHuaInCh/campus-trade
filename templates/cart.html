@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h3 class="mb-4 fw-bold text-primary">我的购物车</h3>
+
+    {% if items %}
+    <div class="row">
+        {% for item in items %}
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm">
+                <div class="row g-0">
+                    <div class="col-4">
+                        <img src="{{ url_for('static', filename='uploads/' + item.product.image) }}"
+                             class="img-fluid rounded-start h-100" style="object-fit: cover;"
+                             alt="{{ item.product.title }}"
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22><rect fill=%22%23e9ecef%22 width=%22150%22 height=%22150%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2214%22>暂无图片</text></svg>'">
+                    </div>
+                    <div class="col-8">
+                        <div class="card-body">
+                            <h6 class="card-title text-truncate">{{ item.product.title }}</h6>
+                            <p class="text-danger fw-bold mb-1">¥{{ "%.2f"|format(item.product.price) }}</p>
+                            <p class="text-muted small mb-2">
+                                卖家：{{ item.product.seller.username }}
+                                {% if item.product.status == '已售' %}
+                                <span class="badge bg-secondary ms-1">已售出</span>
+                                {% endif %}
+                            </p>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('product_detail', product_id=item.product.id) }}"
+                                   class="btn btn-outline-primary btn-sm">查看详情</a>
+                                <form method="post" action="{{ url_for('cart_remove', item_id=item.id) }}">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">移除</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <p class="text-muted fs-5">购物车是空的</p>
+        <a href="{{ url_for('browse') }}" class="btn btn-primary">去逛逛</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

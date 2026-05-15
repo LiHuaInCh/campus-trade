@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h3 class="mb-4 fw-bold text-warning">管理后台</h3>
+
+    <!-- 用户管理 -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-bold d-flex justify-content-between">
+            <span>用户管理 ({{ users|length }})</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>手机号</th>
+                            <th>角色</th>
+                            <th>注册时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.phone }}</td>
+                            <td>
+                                {% if user.is_admin %}
+                                <span class="badge bg-warning text-dark">管理员</span>
+                                {% else %}
+                                <span class="badge bg-secondary">用户</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted small">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                {% if not user.is_admin %}
+                                <form method="post" action="{{ url_for('admin_delete_user', user_id=user.id) }}"
+                                      onsubmit="return confirm('确认删除用户 {{ user.username }}？该用户的所有商品、留言、私信也会被删除。')">
+                                    <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                                </form>
+                                {% else %}
+                                <button class="btn btn-secondary btn-sm" disabled>受保护</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品管理 -->
+    <div class="card shadow-sm">
+        <div class="card-header fw-bold">
+            <span>商品管理 ({{ products|length }})</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>商品名称</th>
+                            <th>价格</th>
+                            <th>卖家</th>
+                            <th>状态</th>
+                            <th>发布时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.id }}</td>
+                            <td>
+                                <a href="{{ url_for('product_detail', product_id=product.id) }}">
+                                    {{ product.title }}
+                                </a>
+                            </td>
+                            <td class="text-danger">¥{{ "%.2f"|format(product.price) }}</td>
+                            <td>{{ product.seller.username }}</td>
+                            <td>
+                                <span class="badge {% if product.status == '在售' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ product.status }}
+                                </span>
+                            </td>
+                            <td class="text-muted small">{{ product.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <form method="post" action="{{ url_for('admin_delete_product', product_id=product.id) }}"
+                                      onsubmit="return confirm('确认删除商品 {{ product.title }}？相关的留言和购物车记录也会被删除。')">
+                                    <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h3 class="mb-4 fw-bold text-primary">私信</h3>
+
+    {% if partners %}
+    <div class="list-group shadow-sm">
+        {% for p in partners %}
+        <a href="{{ url_for('conversation', partner_id=p.user.id) }}"
+           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ p.user.username }}</strong>
+                {% if p.unread > 0 %}
+                <span class="badge bg-danger ms-2">{{ p.unread }}条新消息</span>
+                {% endif %}
+            </div>
+            <small class="text-muted">
+                {% if p.last_time %}
+                {{ p.last_time.strftime('%m-%d %H:%M') }}
+                {% endif %}
+            </small>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <p class="text-muted fs-5">暂无私信</p>
+        <p class="text-muted">在商品详情页可以联系卖家</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

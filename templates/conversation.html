@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">与 <strong>{{ partner.username }}</strong> 的私信</h5>
+                    <a href="{{ url_for('messages') }}" class="btn btn-outline-secondary btn-sm">返回</a>
+                </div>
+                <div class="card-body" style="max-height: 450px; overflow-y: auto;" id="chatBox">
+                    {% if msgs %}
+                        {% for msg in msgs %}
+                        <div class="d-flex flex-column mb-1">
+                            <div class="chat-bubble {% if msg.sender_id == current_user.id %}chat-sent{% else %}chat-received{% endif %}">
+                                <div>{{ msg.content }}</div>
+                            </div>
+                            <small class="text-muted {% if msg.sender_id == current_user.id %}text-end{% endif %} px-2">
+                                {{ msg.created_at.strftime('%m-%d %H:%M') }}
+                            </small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">还没有消息，打个招呼吧</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <form method="post" novalidate>
+                        {{ form.hidden_tag() }}
+                        <div class="input-group">
+                            {{ form.content(class="form-control", placeholder="输入消息...", rows="2") }}
+                            <button type="submit" class="btn btn-primary">发送</button>
+                        </div>
+                        {% if form.content.errors %}
+                            <small class="text-danger">{{ form.content.errors[0] }}</small>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 滚动到聊天框底部
+    const box = document.getElementById('chatBox');
+    if (box) box.scrollTop = box.scrollHeight;
+</script>
+{% endblock %}

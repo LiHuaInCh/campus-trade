@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- 商品信息 -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="row g-0">
+                    <div class="col-md-5">
+                        <img src="{{ url_for('static', filename='uploads/' + product.image) }}"
+                             class="img-fluid rounded-start w-100" style="object-fit: cover; min-height: 280px;"
+                             alt="{{ product.title }}"
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22280%22><rect fill=%22%23e9ecef%22 width=%22300%22 height=%22280%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2216%22>暂无图片</text></svg>'">
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card-body p-4">
+                            <h3 class="card-title">{{ product.title }}</h3>
+                            <span class="badge bg-info mb-2">{{ product.category }}</span>
+                            <span class="badge {% if product.status == '在售' %}bg-success{% else %}bg-secondary{% endif %} mb-2">
+                                {{ product.status }}
+                            </span>
+
+                            <p class="text-danger fw-bold fs-3 mt-3">¥{{ "%.2f"|format(product.price) }}</p>
+                            <p class="text-muted">{{ product.description }}</p>
+                            <p class="text-muted small">
+                                卖家：{{ product.seller.username }} ｜
+                                发布于 {{ product.created_at.strftime('%Y-%m-%d %H:%M') }}
+                            </p>
+
+                            {% if current_user.is_authenticated and product.status == '在售' and product.seller_id != current_user.id %}
+                            <div class="d-flex gap-2 flex-wrap">
+                                <form method="post" action="{{ url_for('buy_product', product_id=product.id) }}"
+                                      onsubmit="return confirm('确认购买该商品？')">
+                                    <button type="submit" class="btn btn-danger">立即购买</button>
+                                </form>
+                                <form method="post" action="{{ url_for('cart_add', product_id=product.id) }}">
+                                    <button type="submit" class="btn btn-outline-warning">加入购物车</button>
+                                </form>
+                                <a href="{{ url_for('conversation', partner_id=product.seller_id) }}"
+                                   class="btn btn-outline-primary">联系卖家</a>
+                            </div>
+                            {% endif %}
+
+                            {% if product.status == '已售' %}
+                            <button class="btn btn-secondary" disabled>已售出</button>
+                            {% endif %}
+
+                            {% if current_user.is_authenticated and product.seller_id == current_user.id %}
+                            <p class="text-primary small mt-2">这是您发布的商品</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 留言区 -->
+            <div class="card shadow-sm">
+                <div class="card-header fw-bold">留言 ({{ messages|length }})</div>
+                <div class="card-body">
+                    {% if current_user.is_authenticated %}
+                    <form method="post" novalidate>
+                        {{ message_form.hidden_tag() }}
+                        <div class="mb-2">
+                            {{ message_form.content(class="form-control", rows="2", placeholder="写下你的留言...") }}
+                            {% if message_form.content.errors %}
+                                <small class="text-danger">{{ message_form.content.errors[0] }}</small>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">发表留言</button>
+                    </form>
+                    <hr>
+                    {% else %}
+                    <p class="text-muted"><a href="{{ url_for('login') }}">登录</a>后可以留言</p>
+                    {% endif %}
+
+                    {% if messages %}
+                        {% for msg in messages %}
+                        <div class="border-bottom pb-2 mb-2">
+                            <div class="d-flex justify-content-between">
+                                <strong class="text-primary">{{ msg.author.username }}</strong>
+                                <small class="text-muted">{{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                            <p class="mb-0 text-muted">{{ msg.content }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center mb-0">暂无留言</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 侧边栏 -->
+        <div class="col-lg-4 d-none d-lg-block">
+            <div class="card shadow-sm">
+                <div class="card-header fw-bold">卖家信息</div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>用户名：</strong>{{ product.seller.username }}</p>
+                    <p class="mb-1"><strong>手机号：</strong>{{ product.seller.phone }}</p>
+                    <p class="mb-0"><strong>发布时间：</strong>{{ product.created_at.strftime('%Y-%m-%d') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{{ url_for('browse') }}" class="btn btn-outline-secondary">返回首页</a>
+    </div>
+</div>
+{% endblock %}

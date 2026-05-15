@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Hero 大Banner -->
+<div class="bg-primary text-white">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h1 class="display-4 fw-bold">校园二手交易平台</h1>
+                <p class="lead opacity-90 mt-3">
+                    课本太贵？毕业带不走？来这里淘好物、卖闲置。<br>
+                    安全、便捷、只为校内交易。
+                </p>
+                <div class="mt-4 d-flex gap-3 flex-wrap">
+                    <a href="{{ url_for('browse') }}" class="btn btn-light btn-lg px-4 fw-bold text-primary">立即逛逛</a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg px-4">免费注册</a>
+                    {% else %}
+                    <a href="{{ url_for('publish') }}" class="btn btn-outline-light btn-lg px-4">发布商品</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 text-center d-none d-lg-block">
+                <i class="bi bi-cart4" style="font-size: 12rem; opacity: 0.2;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container py-5">
+    <!-- 热门分类 -->
+    <div class="text-center mb-4">
+        <h3 class="fw-bold">热门分类</h3>
+        <p class="text-muted">快速找到你想要的</p>
+    </div>
+    <div class="row row-cols-3 row-cols-md-6 g-3 mb-5">
+        {% set categories = [
+            ("书籍", "bi-book", "primary"),
+            ("电子产品", "bi-phone", "success"),
+            ("生活用品", "bi-house-heart", "warning"),
+            ("衣物", "bi-handbag", "danger"),
+            ("运动器材", "bi-bicycle", "info"),
+            ("其他", "bi-grid", "secondary"),
+        ] %}
+        {% for cname, cicon, ccolor in categories %}
+        <div class="col text-center">
+            <a href="{{ url_for('browse', category=cname) }}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm py-3" style="transition: transform 0.15s;"
+                     onmouseover="this.style.transform='translateY(-4px)'"
+                     onmouseout="this.style.transform='translateY(0)'">
+                    <div class="card-body py-2">
+                        <i class="bi {{ cicon }} fs-1 text-{{ ccolor }}"></i>
+                        <p class="mb-0 mt-2 fw-bold text-dark">{{ cname }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 最新上架 -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="fw-bold mb-0"><i class="bi bi-lightning-charge-fill text-warning"></i> 最新上架</h3>
+            <small class="text-muted">刚刚发布，先到先得</small>
+        </div>
+        <a href="{{ url_for('browse') }}" class="btn btn-outline-primary">查看全部 <i class="bi bi-arrow-right"></i></a>
+    </div>
+
+    {% if latest %}
+    <div class="row row-cols-2 row-cols-md-4 g-3 mb-5">
+        {% for product in latest %}
+        <div class="col">
+            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="text-decoration-none text-dark">
+                <div class="card product-card h-100 shadow-sm border-0">
+                    <div class="position-relative">
+                        <img src="{{ url_for('static', filename='uploads/' + product.image) }}"
+                             class="card-img-top product-img" alt="{{ product.title }}"
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22200%22><rect fill=%22%23e9ecef%22 width=%22300%22 height=%22200%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2216%22>暂无图片</text></svg>'">
+                        <span class="position-absolute top-0 start-0 badge bg-warning text-dark m-1" style="font-size:0.7rem;">NEW</span>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title text-truncate mb-1">{{ product.title }}</h6>
+                        <p class="card-text text-danger fw-bold fs-6 mb-0">¥{{ "%.2f"|format(product.price) }}</p>
+                        <small class="text-muted">{{ product.seller.username }}</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center text-muted py-3 mb-5">
+        <p>还没有商品，来做第一个发布的人吧！</p>
+    </div>
+    {% endif %}
+
+    <!-- 三步流程 -->
+    <hr class="mb-5">
+    <div class="text-center mb-4">
+        <h3 class="fw-bold">三步搞定</h3>
+        <p class="text-muted">买卖二手就这么简单</p>
+    </div>
+    <div class="row text-center g-4 mb-5">
+        <div class="col-md-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 mb-3" style="width: 72px; height: 72px;">
+                <i class="bi bi-person-plus fs-2 text-primary"></i>
+            </div>
+            <h5>注册账号</h5>
+            <p class="text-muted small">填写基本信息，30秒完成注册</p>
+        </div>
+        <div class="col-md-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10 mb-3" style="width: 72px; height: 72px;">
+                <i class="bi bi-plus-circle fs-2 text-success"></i>
+            </div>
+            <h5>发布 / 浏览商品</h5>
+            <p class="text-muted small">上传闲置物品，或者逛逛有什么好东西</p>
+        </div>
+        <div class="col-md-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10 mb-3" style="width: 72px; height: 72px;">
+                <i class="bi bi-chat-dots fs-2 text-warning"></i>
+            </div>
+            <h5>沟通 & 交易</h5>
+            <p class="text-muted small">私信联系卖家，谈好价格完成交易</p>
+        </div>
+    </div>
+
+    <!-- 底部 CTA -->
+    {% if not current_user.is_authenticated %}
+    <div class="text-center bg-light rounded-3 p-5">
+        <h4 class="fw-bold">准备好开始了吗？</h4>
+        <p class="text-muted">加入校园二手交易，发现身边的好物</p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-5">立即注册</a>
+        <p class="mt-2 small text-muted">已有账号？<a href="{{ url_for('login') }}">去登录</a></p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

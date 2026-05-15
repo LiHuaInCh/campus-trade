@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="text-center mb-4 fw-bold text-primary">注册</h3>
+
+                    <form method="post" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.username.label }}</label>
+                            {{ form.username(class="form-control", placeholder="2-50个字符") }}
+                            {% if form.username.errors %}
+                                <small class="text-danger">{{ form.username.errors[0] }}</small>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.phone.label }}</label>
+                            {{ form.phone(class="form-control", placeholder="请输入手机号") }}
+                            {% if form.phone.errors %}
+                                <small class="text-danger">{{ form.phone.errors[0] }}</small>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.password.label }}</label>
+                            {{ form.password(class="form-control", placeholder="至少6位密码") }}
+                            {% if form.password.errors %}
+                                <small class="text-danger">{{ form.password.errors[0] }}</small>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.confirm.label }}</label>
+                            {{ form.confirm(class="form-control", placeholder="再输一次密码") }}
+                            {% if form.confirm.errors %}
+                                <small class="text-danger">{{ form.confirm.errors[0] }}</small>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">注册</button>
+                    </form>
+
+                    <p class="text-center mt-3 mb-0">
+                        已有账号？<a href="{{ url_for('login') }}">去登录</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
